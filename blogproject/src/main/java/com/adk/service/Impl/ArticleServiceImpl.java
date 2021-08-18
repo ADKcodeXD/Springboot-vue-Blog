@@ -1,12 +1,15 @@
 package com.adk.service.Impl;
 
 import com.adk.dao.dos.Archives;
+import com.adk.dao.mapper.ArticleBodyMapper;
 import com.adk.dao.mapper.ArticleMapper;
+import com.adk.dao.mapper.CategoryMapper;
 import com.adk.pojo.Article;
-import com.adk.service.ArticleService;
-import com.adk.service.SysUserService;
-import com.adk.service.TagService;
+import com.adk.pojo.ArticleBody;
+import com.adk.service.*;
+import com.adk.vo.ArticleBodyVo;
 import com.adk.vo.ArticleVo;
+import com.adk.vo.CategoryVo;
 import com.adk.vo.Result;
 import com.adk.vo.params.PageParams;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -28,6 +31,10 @@ public class ArticleServiceImpl implements ArticleService {
     private SysUserService sysUserService;
     @Autowired
     private TagService tagService;
+    @Autowired
+    private CategoryService categoryService;
+    @Autowired
+    private ThreadService threadService;
 
     @Override
     public Result listArticle(PageParams pageParams) {
@@ -50,7 +57,7 @@ public class ArticleServiceImpl implements ArticleService {
         List<Article> records = articlePage.getRecords();
 
         //将获取到的article对象转换为articleVo对象
-        List<ArticleVo> articleVoList =copyList(records);
+        List<ArticleVo> articleVoList =copyList(records,true,true);
 
         //最后封装到Result中，返回Result
         return Result.success(articleVoList);
@@ -74,7 +81,7 @@ public class ArticleServiceImpl implements ArticleService {
         //这个querywrapper是用于拼接sql语句的  可以不用自行编写sql语句
         List<Article> articles=articleMapper.selectList(queryWrapper);
 
-        return Result.success(copyList(articles));
+        return Result.success(copyList(articles,false,false));
     }
 
 
@@ -95,7 +102,7 @@ public class ArticleServiceImpl implements ArticleService {
         //这个querywrapper是用于拼接sql语句的  可以不用自行编写sql语句
         List<Article> articles=articleMapper.selectList(queryWrapper);
 
-        return Result.success(copyList(articles));
+        return Result.success(copyList(articles,false,false));
     }
 
     /**
@@ -112,15 +119,52 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
+     * 实现根据文章id来查询文章信息
+     * 根据article中的id去查询body和标签中的id
+     * @param id
+     * @return
+     */
+    @Override
+    public Result findArticleById(Long id) {
+        Article article=articleMapper.selectById(id);
+        ArticleVo articleVo = copy(article,true,true,true,true);
+
+        /**
+         * 使用线程池   进行阅读量的更新
+         */
+        threadService.updateArticleViewCount(articleMapper,article);
+
+
+        return Result.success(articleVo);
+    }
+
+    /**
      * 做转移，
      * 将数据库得来的records转换为渲染到页面上的ArticleAo
      * @param records
      * @return
      */
-    private List<ArticleVo> copyList(List<Article> records) {
+    private List<ArticleVo> copyList(List<Article> records,boolean isTag,boolean isAuthor) {
         List<ArticleVo> articleVoList=new ArrayList<>();
         for (Article record : records) {
-            articleVoList.add(copy(record,true,true));
+            articleVoList.add(copy(record,isTag,isAuthor,false,false));
+        }
+        return articleVoList;
+    }
+
+    /**
+     * 重载copylist 用于获取全部信息
+     * @param records
+     * @param isTag
+     * @param isAuthor
+     * @param isBody
+     * @param isCategory
+     * @return
+     */
+    private List<ArticleVo> copyList(List<Article> records,boolean isTag,boolean isAuthor,boolean isBody,boolean isCategory) {
+        List<ArticleVo> articleVoList=new ArrayList<>();
+        for (Article record : records) {
+            articleVoList.add(copy(record,isTag,isAuthor,isBody,isCategory));
         }
         return articleVoList;
     }
@@ -130,10 +174,13 @@ public class ArticleServiceImpl implements ArticleService {
      * @param article
      * @return
      */
-    private ArticleVo copy(Article article,boolean isTag,boolean isAuthor){
+    private ArticleVo copy(Article article,boolean isTag,boolean isAuthor,boolean isBody,boolean isCategory){
 
         ArticleVo articleVo = new ArticleVo();
         BeanUtils.copyProperties(article,articleVo);
+        //将查到的long型的数据转换为string赋值给前端展示对象
+        String id=article.getId().toString();
+        articleVo.setId(id);
         //该工具类可以将不同bean相同的属性copy过去，但是类型不同是不可以copy的
 
         //手动将日期的long类型转换为字符串
@@ -141,7 +188,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         //由于并不是所有的接口都需要作者名和标签名
         //因此设置两个参数 isTag和isAuthor 来判断是否设置这两个参数
-        if(isTag){
+        if (isTag){
             Long articleid=article.getId();
             articleVo.setTags(tagService.findTagByArticleId(articleid));
         }
@@ -149,6 +196,24 @@ public class ArticleServiceImpl implements ArticleService {
             Long authorId = article.getAuthorId();
             articleVo.setAuthor(sysUserService.findUserById(authorId).getNickname());
         }
+        if (isBody){
+            Long bodyId=article.getBodyId();
+            articleVo.setBody(findArticleBodyById(bodyId));
+        }
+        if (isCategory){
+            Long categoryId = article.getCategoryId();
+            articleVo.setCategory(categoryService.findCategoryById(categoryId));
+        }
         return articleVo;
+    }
+
+    @Autowired
+    private ArticleBodyMapper articleBodyMapper;
+
+    private ArticleBodyVo findArticleBodyById(Long bodyId) {
+        ArticleBody articleBody = articleBodyMapper.selectById(bodyId);
+        ArticleBodyVo articleBodyVo = new ArticleBodyVo();
+        articleBodyVo.setContent(articleBody.getContent());
+        return articleBodyVo;
     }
 }

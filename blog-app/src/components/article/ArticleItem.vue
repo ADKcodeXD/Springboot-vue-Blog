@@ -1,5 +1,5 @@
 <template>
-  <el-card class="me-area" :body-style="{ padding: '16px' }">
+  <el-card class="me-area" :body-style="{ padding: '16px' }" style="border-radius: 25px;">
     <div class="me-article-header">
 
       <a @click="view(id)" class="me-article-title">{{title}}</a>

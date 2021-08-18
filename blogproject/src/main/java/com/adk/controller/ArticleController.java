@@ -5,10 +5,7 @@ import com.adk.service.ArticleService;
 import com.adk.vo.Result;
 import com.adk.vo.params.PageParams;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController//json数据交互需要使用该controller
 @RequestMapping("articles")
@@ -42,5 +39,14 @@ public class ArticleController {
     @PostMapping("listArchives")
     public Result listArchives(){
         return articleService.listArchives();
+    }
+
+    //文章主体
+    @PostMapping("view/{id}")
+    public Result findArticleById(@PathVariable("id")Long id){
+        /**
+         * 通过pathvariable来获取链接中的id值
+         */
+        return articleService.findArticleById(id);
     }
 }

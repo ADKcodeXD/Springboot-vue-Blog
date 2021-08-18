@@ -3,7 +3,7 @@
     <div class="me-footer">
       <p>Designed by
         <strong>
-          <router-link to="/" class="me-login-design-color">码神之路</router-link>
+          <router-link to="/" class="me-login-design-color">ADKCodeXD</router-link>
         </strong>
       </p>
     </div>
@@ -36,15 +36,15 @@
   }
 
   .me-footer {
-    text-align: center;
-    line-height: 60px;
+    text-align: left;
+    line-height: 40px;
     font-family: 'Open Sans', sans-serif;
-    font-size: 18px;
+    font-size: 10px;
 
   }
 
   .me-login-design-color {
-    color: #5FB878 !important;
+    color: #ec5e1c !important;
   }
 
 </style>

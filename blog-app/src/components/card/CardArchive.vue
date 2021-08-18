@@ -1,6 +1,6 @@
 <template>
 
-  <el-card :body-style="{ padding: '8px 18px' }">
+  <el-card :body-style="{ padding: '8px 18px' }" style="border-radius: 30px; background-color:#ffffff ;">
     <div slot="header" class="me-category-header">
       <span>{{cardHeader}}</span>
     </div>

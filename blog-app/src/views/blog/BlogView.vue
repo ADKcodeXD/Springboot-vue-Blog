@@ -160,7 +160,7 @@
         return default_avatar
       },
       title() {
-        return `${this.article.title} - 文章 - 码神之路`
+        return `${this.article.title} - 文章 - ADK的小博客 `
       }
     },
     methods: {
