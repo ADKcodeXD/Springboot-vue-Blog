@@ -2,6 +2,7 @@ package com.adk.service;
 
 import com.adk.pojo.SysUser;
 import com.adk.vo.Result;
+import com.adk.vo.UserVo;
 
 public interface SysUserService {
 
@@ -14,4 +15,6 @@ public interface SysUserService {
     void save(SysUser sysUser);
 
     SysUser findUserByAccount(String account);
+
+    UserVo findUserVoById(Long authorId);
 }

@@ -8,6 +8,7 @@ import com.adk.service.SysUserService;
 import com.adk.vo.ErrorCode;
 import com.adk.vo.LoginUserVo;
 import com.adk.vo.Result;
+import com.adk.vo.UserVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -88,5 +89,18 @@ public class SysUserServiceImpl implements SysUserService {
         queryWrapper.eq(SysUser::getAccount,account);
         queryWrapper.last("limit 1");
         return this.sysUserMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public UserVo findUserVoById(Long authorId) {
+        SysUser sysUser=sysUserMapper.selectById(authorId);
+        if (sysUser==null){
+            sysUser = new SysUser();
+            sysUser.setNickname("默认作者");
+        }
+        UserVo userVo =new UserVo();
+        BeanUtils.copyProperties(sysUser,userVo);
+        userVo.setId(sysUser.getId().toString());
+        return userVo;
     }
 }
