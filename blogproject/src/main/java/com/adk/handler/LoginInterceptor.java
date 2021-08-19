@@ -46,6 +46,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 
         String token= request.getHeader("Authorization");
 
+
         if(StringUtils.isBlank(token)){
             Result result=Result.fail(ErrorCode.NO_LOGIN.getCode(),ErrorCode.NO_LOGIN.getMsg());
             response.setContentType("application/json;charset=utf-8");

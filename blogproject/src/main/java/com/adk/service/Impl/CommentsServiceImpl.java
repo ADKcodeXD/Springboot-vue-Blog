@@ -2,11 +2,15 @@ package com.adk.service.Impl;
 
 import com.adk.dao.mapper.CommentsMapper;
 import com.adk.pojo.Comment;
+import com.adk.pojo.SysUser;
 import com.adk.service.CommentsService;
 import com.adk.service.SysUserService;
+import com.adk.utils.UserThreadLocal;
 import com.adk.vo.CommentVo;
+import com.adk.vo.ErrorCode;
 import com.adk.vo.Result;
 import com.adk.vo.UserVo;
+import com.adk.vo.params.CommentParams;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +35,7 @@ public class CommentsServiceImpl implements CommentsService {
     @Override
     public Result commentsByArticleId(Long id) {
         LambdaQueryWrapper<Comment> queryWrapper=new LambdaQueryWrapper<>();
-        queryWrapper.eq(Comment::getId,id);
+        queryWrapper.eq(Comment::getArticleId,id);
         queryWrapper.eq(Comment::getLevel,1);
         List<Comment> commentList = commentsMapper.selectList(queryWrapper);
         List<CommentVo> commentVoList=copyList(commentList);
@@ -39,9 +43,30 @@ public class CommentsServiceImpl implements CommentsService {
         return Result.success(commentVoList);
     }
 
-
-
-
+    @Override
+    public Result comment(CommentParams commentParams) {
+        SysUser sysUser= UserThreadLocal.get();
+        if (sysUser==null){
+            return Result.fail(ErrorCode.NO_LOGIN.getCode(),ErrorCode.NO_LOGIN.getMsg());
+        }
+        //可以直接通过线程池来获得当前登录的用户
+        Comment comment=new Comment();
+        comment.setAuthorId(sysUser.getId());
+        comment.setContent(commentParams.getContent());
+        comment.setArticleId(commentParams.getArticleId());
+        comment.setCreateDate(System.currentTimeMillis());
+        Long parent=commentParams.getParent();
+        if(parent==null||parent==0){
+            comment.setLevel(1);
+        }else {
+            comment.setLevel(2);
+        }
+        comment.setParentId(parent==null ? 0: parent);
+        Long toUserId=commentParams.getToUserId();
+        comment.setToUid(toUserId==null? 0:toUserId);
+        commentsMapper.insert(comment);
+        return Result.success(null);
+    }
 
 
     /**

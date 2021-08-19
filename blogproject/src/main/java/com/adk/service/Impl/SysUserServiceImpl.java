@@ -38,7 +38,6 @@ public class SysUserServiceImpl implements SysUserService {
         LambdaQueryWrapper<SysUser> queryWrapper=new LambdaQueryWrapper<>();
         queryWrapper.eq(SysUser::getAccount,account);
         queryWrapper.eq(SysUser::getPassword,password);
-        queryWrapper.select(SysUser::getNickname,SysUser::getAvatar,SysUser::getAccount);
         queryWrapper.last("limit 1");//加上limit1加快查询效率
         return sysUserMapper.selectOne(queryWrapper);
     }
@@ -101,6 +100,7 @@ public class SysUserServiceImpl implements SysUserService {
         UserVo userVo =new UserVo();
         BeanUtils.copyProperties(sysUser,userVo);
         userVo.setId(sysUser.getId().toString());
+
         return userVo;
     }
 }

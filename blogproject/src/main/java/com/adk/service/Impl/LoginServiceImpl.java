@@ -4,6 +4,7 @@ import com.adk.pojo.SysUser;
 import com.adk.service.LoginService;
 import com.adk.service.SysUserService;
 import com.adk.utils.JWTUtils;
+import com.adk.utils.UserThreadLocal;
 import com.adk.vo.ErrorCode;
 import com.adk.vo.Result;
 import com.adk.vo.params.LoginParams;
@@ -76,6 +77,7 @@ public class LoginServiceImpl implements LoginService {
         }
         //去redis中获取userJson 若为空则再次返回(说明过期了)
         String userJson = redisTemplate.opsForValue().get("TOKEN_" + token);
+        System.out.println(userJson);
         if(StringUtils.isBlank(userJson)){
             return null;
         }
@@ -113,6 +115,7 @@ public class LoginServiceImpl implements LoginService {
         String account=loginParams.getAccount();
         String password=loginParams.getPassword();
         String nickname=loginParams.getNickname();
+
         if (StringUtils.isBlank(account)||StringUtils.isBlank(password)||StringUtils.isBlank(nickname)){
             return Result.fail(ErrorCode.ACCOUNT_PWD_NOT_EXIST.getCode(),ErrorCode.ACCOUNT_PWD_NOT_EXIST.getMsg());
         }

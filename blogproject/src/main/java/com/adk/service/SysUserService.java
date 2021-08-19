@@ -1,6 +1,7 @@
 package com.adk.service;
 
 import com.adk.pojo.SysUser;
+import com.adk.vo.LoginUserVo;
 import com.adk.vo.Result;
 import com.adk.vo.UserVo;
 
