@@ -11,7 +11,8 @@ public enum  ErrorCode {
     ACCOUNT_EXIST(10004,"账号已存在"),
     NO_PERMISSION(70001,"无访问权限"),
     SESSION_TIME_OUT(90001,"会话超时"),
-    NO_LOGIN(90002,"未登录"),;
+    NO_LOGIN(90002,"未登录"),
+    UPLOAD_ERROR(20001,"上传失败");
 
     ErrorCode(int code, String msg) {
         this.code = code;

@@ -196,6 +196,7 @@
             that.comment.content = ''
             that.comments.unshift(data.data)
             that.commentCountsIncrement()
+            window.location.reload
 
           }else{
                that.$message({type: 'error', message: data.msg, showClose: true})
@@ -207,12 +208,11 @@
           }
         })
       },
-
       getCommentsByArticle() {
         let that = this
         getCommentsByArticle(that.article.id).then(data => {
           if(data.success){
-               that.comments = data.data
+               that.comments = data.data 
           }else{
              that.$message({type: 'error', message: '评论加载失败', showClose: true})
           }

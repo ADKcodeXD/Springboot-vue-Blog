@@ -1,8 +1,10 @@
 package com.adk.controller;
 
 
+import com.adk.common.aop.LogAnnotation;
 import com.adk.service.ArticleService;
 import com.adk.vo.Result;
+import com.adk.vo.params.ArticleParams;
 import com.adk.vo.params.PageParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,7 @@ public class ArticleController {
         首页文章列表的controller
      */
     @PostMapping
+    @LogAnnotation(module="文章",operator="获取文章列表")
     public Result listArticle(@RequestBody PageParams pageParams){
         return articleService.listArticle(pageParams);
     }
@@ -48,5 +51,13 @@ public class ArticleController {
          * 通过pathvariable来获取链接中的id值
          */
         return articleService.findArticleById(id);
+    }
+
+    /**
+     * 文章发布
+     */
+    @PostMapping("publish")
+    public Result publish(@RequestBody ArticleParams articleParams){
+        return articleService.publish(articleParams);
     }
 }

@@ -6,6 +6,7 @@ import com.adk.pojo.Tag;
 import com.adk.service.TagService;
 import com.adk.vo.Result;
 import com.adk.vo.TagVo;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,6 +63,14 @@ public class TagServiceImpl implements TagService {
         return Result.success(tagVos);
     }
 
+    @Override
+    public Result findAll() {
+        List<Tag> tagList = tagMapper.selectList(new LambdaQueryWrapper<>());
+        List<TagVo> tagVos = copyList(tagList);
+
+        return Result.success(tagVos);
+    }
+
     /**
      * copy类
      * @param tag
@@ -70,7 +79,7 @@ public class TagServiceImpl implements TagService {
     public TagVo copy(Tag tag){
         TagVo tagVo = new TagVo();
         BeanUtils.copyProperties(tag,tagVo);
-        tagVo.setId(String.valueOf(tag.getId()));
+        tagVo.setId(tag.getId());
         return tagVo;
     }
     public List<TagVo> copyList(List<Tag> tagList){

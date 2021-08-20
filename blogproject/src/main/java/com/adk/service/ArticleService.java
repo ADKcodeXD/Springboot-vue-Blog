@@ -2,6 +2,7 @@ package com.adk.service;
 
 import com.adk.pojo.Article;
 import com.adk.vo.Result;
+import com.adk.vo.params.ArticleParams;
 import com.adk.vo.params.PageParams;
 
 import java.awt.print.Pageable;
@@ -20,4 +21,6 @@ public interface ArticleService {
     Result listArchives();
 
     Result findArticleById(Long id);
+
+    Result publish(ArticleParams articleParams);
 }

@@ -3,14 +3,16 @@ package com.adk.service.Impl;
 import com.adk.dao.dos.Archives;
 import com.adk.dao.mapper.ArticleBodyMapper;
 import com.adk.dao.mapper.ArticleMapper;
+import com.adk.dao.mapper.ArticleTagMapper;
 import com.adk.dao.mapper.CategoryMapper;
 import com.adk.pojo.Article;
 import com.adk.pojo.ArticleBody;
+import com.adk.pojo.ArticleTag;
+import com.adk.pojo.SysUser;
 import com.adk.service.*;
-import com.adk.vo.ArticleBodyVo;
-import com.adk.vo.ArticleVo;
-import com.adk.vo.CategoryVo;
-import com.adk.vo.Result;
+import com.adk.utils.UserThreadLocal;
+import com.adk.vo.*;
+import com.adk.vo.params.ArticleParams;
 import com.adk.vo.params.PageParams;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -21,7 +23,9 @@ import org.springframework.stereotype.Service;
 
 import java.awt.print.Pageable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
@@ -35,6 +39,8 @@ public class ArticleServiceImpl implements ArticleService {
     private CategoryService categoryService;
     @Autowired
     private ThreadService threadService;
+    @Autowired
+    private ArticleTagMapper articleTagMapper;
 
     @Override
     public Result listArticle(PageParams pageParams) {
@@ -136,6 +142,56 @@ public class ArticleServiceImpl implements ArticleService {
 
 
         return Result.success(articleVo);
+    }
+
+    /**
+     * 文章发布服务
+     * @param articleParams
+     * @return
+     */
+    @Override
+    public Result publish(ArticleParams articleParams) {
+        SysUser sysUser = UserThreadLocal.get();
+
+        Article article = new Article();
+        article.setAuthorId(sysUser.getId());
+        article.setWeight(Article.Article_Common);
+        article.setViewCounts(0);
+        article.setSummary(articleParams.getSummary());
+        article.setCreateDate(System.currentTimeMillis());
+        article.setCommentCounts(0);
+        article.setTitle(articleParams.getTitle());
+        article.setCategoryId(articleParams.getCategory().getId());
+        //先插入文章 获取文章的id(数据库雪花算法自动生成)
+        articleMapper.insert(article);
+        //将tagid和articleid 加入到  article_tag关联表当中
+        List<TagVo> tags = articleParams.getTags();
+
+        if (tags!=null){
+            for (TagVo tag : tags) {
+                Long id = article.getId();
+                ArticleTag artileTag=new ArticleTag();
+                artileTag.setTagId(tag.getId());
+                artileTag.setArticleId(id);
+                articleTagMapper.insert(artileTag);
+            }
+        }
+        //body
+        ArticleBody articleBody=new ArticleBody();
+
+        articleBody.setArticleId(article.getId());
+        articleBody.setContent(articleParams.getBody().getContent());
+        articleBody.setContentHtml(articleParams.getBody().getContentHtml());
+
+        articleBodyMapper.insert(articleBody);
+
+        article.setBodyId(articleBody.getId());
+        articleMapper.updateById(article);
+
+        Map<String,String> map=new HashMap<>();
+        map.put("id",article.getId().toString());
+
+        return Result.success(map);
     }
 
     /**
