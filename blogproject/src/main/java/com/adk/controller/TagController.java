@@ -24,4 +24,9 @@ public class TagController {
     public Result findAll(){
         return tagService.findAll();
     }
+
+    @GetMapping("detail")
+    public Result findAllDetail(){
+        return tagService.findAllDetail();
+    }
 }
