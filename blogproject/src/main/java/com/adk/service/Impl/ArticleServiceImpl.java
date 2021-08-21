@@ -1,5 +1,6 @@
 package com.adk.service.Impl;
 
+import clojure.lang.IFn;
 import com.adk.dao.dos.Archives;
 import com.adk.dao.mapper.ArticleBodyMapper;
 import com.adk.dao.mapper.ArticleMapper;
@@ -15,6 +16,7 @@ import com.adk.vo.*;
 import com.adk.vo.params.ArticleParams;
 import com.adk.vo.params.PageParams;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
@@ -42,30 +44,62 @@ public class ArticleServiceImpl implements ArticleService {
     @Autowired
     private ArticleTagMapper articleTagMapper;
 
+
+//    @Override
+//    public Result listArticle(PageParams pageParams) {
+//        /**
+//         * mybatis plus 集成了常用的sql查询语句，可以直接调用其方法进行查询
+//         * selectPage需要有两个条件，第一个是page对象，第二个则是查询条件
+//         * 这里使用Page来对pageparams进行再次封装，然后使用lambdaQueryWrapper来写查询条件
+//         * 这样就可以进行一次查询
+//         */
+//        Page<Article> page=new Page<>(pageParams.getPage(),pageParams.getPagesize());
+//        LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
+//
+//        //如果带上了categoryid就按分类来进行查询
+//        if(pageParams.getCategoryId()!=null){
+//            queryWrapper.eq(Article::getCategoryId,pageParams.getCategoryId());
+//        }
+//        //如果带上了tagid就按标签来进行查询
+//        List<Long> articleTagList=new ArrayList<>();
+//        //这是一个list 存放文章的id
+//        if(pageParams.getTagId()!=null){
+//            //要去article_tag表中查询 一对多关系 tag1 : article n
+//            LambdaQueryWrapper<ArticleTag> articleTagQueryMapper=new LambdaQueryWrapper<>();
+//            articleTagQueryMapper.eq(ArticleTag::getTagId,pageParams.getTagId());
+//            List<ArticleTag> articleTags = articleTagMapper.selectList(articleTagQueryMapper);
+//            for (ArticleTag articleTag : articleTags) {
+//                articleTagList.add(articleTag.getArticleId());
+//            }
+//            //获得所有文章的id
+//            if(articleTagList.size()>0){
+//                queryWrapper.in(Article::getId,articleTagList);
+//                //大于0 则将查询条件插入到语句当中
+//            }
+//        }
+//
+//        //相当于order by create_time desc
+//        queryWrapper.orderByDesc(Article::getCreateDate,Article::getWeight);
+//        //需要按照是否置顶进行排序
+//
+//        //这样就得到了一个page 分页查询后的对象
+//        //然后将其放到list里去
+//        Page<Article> articlePage = articleMapper.selectPage(page, queryWrapper);
+//        List<Article> records = articlePage.getRecords();
+//
+//        //将获取到的article对象转换为articleVo对象
+//        List<ArticleVo> articleVoList =copyList(records,true,true);
+//
+//        //最后封装到Result中，返回Result
+//        return Result.success(articleVoList);
+//    }
+
     @Override
     public Result listArticle(PageParams pageParams) {
-        /**
-         * mybatis plus 集成了常用的sql查询语句，可以直接调用其方法进行查询
-         * selectPage需要有两个条件，第一个是page对象，第二个则是查询条件
-         * 这里使用Page来对pageparams进行再次封装，然后使用lambdaQueryWrapper来写查询条件
-         * 这样就可以进行一次查询
-         */
         Page<Article> page=new Page<>(pageParams.getPage(),pageParams.getPagesize());
-        LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
-
-        //相当于order by create_time desc
-        queryWrapper.orderByDesc(Article::getCreateDate,Article::getWeight);
-        //需要按照是否置顶进行排序
-
-        //这样就得到了一个page 分页查询后的对象
-        //然后将其放到list里去
-        Page<Article> articlePage = articleMapper.selectPage(page, queryWrapper);
-        List<Article> records = articlePage.getRecords();
-
-        //将获取到的article对象转换为articleVo对象
-        List<ArticleVo> articleVoList =copyList(records,true,true);
-
-        //最后封装到Result中，返回Result
+        IPage<Article> articleIPage = articleMapper.listArticle(page, pageParams.getCategoryId(), pageParams.getTagId(), pageParams.getYear(), pageParams.getMonth());
+        List<Article> records = articleIPage.getRecords();
+        List<ArticleVo> articleVoList = copyList(records, true, true);
         return Result.success(articleVoList);
     }
 
@@ -161,7 +195,7 @@ public class ArticleServiceImpl implements ArticleService {
         article.setCreateDate(System.currentTimeMillis());
         article.setCommentCounts(0);
         article.setTitle(articleParams.getTitle());
-        article.setCategoryId(articleParams.getCategory().getId());
+        article.setCategoryId(Long.valueOf(articleParams.getCategory().getId()));
         //先插入文章 获取文章的id(数据库雪花算法自动生成)
         articleMapper.insert(article);
         //将tagid和articleid 加入到  article_tag关联表当中
@@ -171,7 +205,7 @@ public class ArticleServiceImpl implements ArticleService {
             for (TagVo tag : tags) {
                 Long id = article.getId();
                 ArticleTag artileTag=new ArticleTag();
-                artileTag.setTagId(tag.getId());
+                artileTag.setTagId(Long.valueOf(tag.getId()));
                 artileTag.setArticleId(id);
                 articleTagMapper.insert(artileTag);
             }

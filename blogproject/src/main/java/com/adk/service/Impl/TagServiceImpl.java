@@ -79,6 +79,12 @@ public class TagServiceImpl implements TagService {
         return Result.success(tagVos);
     }
 
+    @Override
+    public Result findAllDetailById(Long id) {
+        Tag tag = tagMapper.selectById(id);
+        return Result.success(copy(tag));
+    }
+
     /**
      * copy类
      * @param tag
@@ -87,7 +93,7 @@ public class TagServiceImpl implements TagService {
     public TagVo copy(Tag tag){
         TagVo tagVo = new TagVo();
         BeanUtils.copyProperties(tag,tagVo);
-        tagVo.setId(tag.getId());
+        tagVo.setId(tag.getId().toString());
         return tagVo;
     }
     public List<TagVo> copyList(List<Tag> tagList){

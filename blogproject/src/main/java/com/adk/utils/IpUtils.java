@@ -62,4 +62,8 @@ public class IpUtils {
         HttpServletRequest request = HttpContextUtils.getHttpServletRequest();
         return getIpAddr(request);
     }
+
+    public static void main(String[] args) {
+
+    }
 }

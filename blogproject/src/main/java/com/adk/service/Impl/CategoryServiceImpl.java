@@ -43,6 +43,13 @@ public class CategoryServiceImpl implements CategoryService {
         return Result.success(copyList(categories));
     }
 
+    @Override
+    public Result findAllDetailsById(Long id) {
+        Category category = categoryMapper.selectById(id);
+
+        return Result.success(copy(category));
+    }
+
     private List<CategoryVo> copyList(List<Category> categories) {
         List<CategoryVo> categoryVoList=new ArrayList<>();
         for (Category category : categories) {
@@ -54,6 +61,7 @@ public class CategoryServiceImpl implements CategoryService {
     private CategoryVo copy(Category category) {
         CategoryVo categoryVo=new CategoryVo();
         BeanUtils.copyProperties(category,categoryVo);
+        categoryVo.setId(category.getId().toString());
         return categoryVo;
     }
 }

@@ -11,4 +11,10 @@ public class PageParams {
     //这个是用于分页插件的参数体，默认为第一页 每页十条数据
     private int page=1;
     private int pagesize=10;
+
+    private Long categoryId;
+    private Long tagId;
+
+    private String year;
+    private String month;
 }

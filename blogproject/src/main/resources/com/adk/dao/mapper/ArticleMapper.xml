@@ -5,6 +5,19 @@
 <!--namespace写上对应的dao名路径-->
 <mapper namespace="com.adk.dao.mapper.ArticleMapper">
 
+    <resultMap id="articleMap" type="com.adk.pojo.Article">
+        <id column="id" property="id"/>
+        <result column="comment_counts" property="commentCounts"/>
+        <result column="create_date" property="createDate"/>
+        <result column="summary" property="summary"/>
+        <result column="title" property="title"/>
+        <result column="view_counts" property="viewCounts"/>
+        <result column="weight" property="weight"/>
+        <result column="author_id" property="authorId"/>
+        <result column="body_id" property="bodyId"/>
+        <result column="category_id" property="categoryId"/>
+    </resultMap>
+
     <select id="listArchives" resultType="com.adk.dao.dos.Archives">
         SELECT
             YEAR(FROM_UNIXTIME(create_date/1000)) as year,
@@ -12,5 +25,22 @@
             count(*) as count
         FROM ms_article
         GROUP BY year,month
+    </select>
+    <select id="listArticle" resultMap="articleMap">
+        select * from ms_article
+        <where>
+            <if test="categoryId !=null">
+                and category_id=#{categoryId}
+            </if>
+            <if test="tagId !=null">
+                and id in (select article_id from ms_article_tag where tag_id=#{tagId})
+            </if>
+            <if test="year!=null and year.length>0 and month!=null and month.length>0">
+                and
+                (YEAR(FROM_UNIXTIME(create_date/1000)) =#{year} and
+                MONTH(FROM_UNIXTIME(create_date/1000)) =#{month})
+            </if>
+        </where>
+        order by weight,create_date desc
     </select>
 </mapper>
