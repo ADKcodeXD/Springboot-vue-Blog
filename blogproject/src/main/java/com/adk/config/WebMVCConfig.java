@@ -24,6 +24,7 @@ public class WebMVCConfig implements WebMvcConfigurer {
             .addPathPatterns("/comments/create/change")
             .addPathPatterns("/articles/publish");
 
+
         //添加一个登录拦截器
     }
 }

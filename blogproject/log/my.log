@@ -20,3 +20,7 @@
 [DEBUG][21-08-22][freemarker.cache]TemplateLoader.findTemplateSource("error_zh.ftlh"): Not found
 [DEBUG][21-08-22][freemarker.cache]TemplateLoader.findTemplateSource("error.ftlh"): Not found
 [DEBUG][21-08-22][freemarker.cache]"error.ftlh"("zh_CN", UTF-8, parsed) cached copy not yet stale; using cached.
+[DEBUG][21-08-23][freemarker.cache]Couldn't find template in cache for "error.ftlh"("zh_CN", UTF-8, parsed); will try to load it.
+[DEBUG][21-08-23][freemarker.cache]TemplateLoader.findTemplateSource("error_zh_CN.ftlh"): Not found
+[DEBUG][21-08-23][freemarker.cache]TemplateLoader.findTemplateSource("error_zh.ftlh"): Not found
+[DEBUG][21-08-23][freemarker.cache]TemplateLoader.findTemplateSource("error.ftlh"): Not found

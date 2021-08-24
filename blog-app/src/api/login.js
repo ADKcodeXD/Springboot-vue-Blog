@@ -40,3 +40,10 @@ export function register(account, nickname, password) {
     data
   })
 }
+
+export function getUserAllInfo(id){
+  return request({
+    url:`/users/currentUserAllInfo/${id}`,
+    method:'get'
+  })
+}

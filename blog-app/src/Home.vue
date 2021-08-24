@@ -6,7 +6,7 @@
 		  
 		  <router-view class="me-container"/>
 		  
-			<base-footer v-show="footerShow"></base-footer>
+		<base-footer v-show="footerShow"></base-footer>
 		  
 		</el-container>
 		

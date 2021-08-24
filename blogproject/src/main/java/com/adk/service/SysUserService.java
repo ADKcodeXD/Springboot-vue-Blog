@@ -18,4 +18,6 @@ public interface SysUserService {
     SysUser findUserByAccount(String account);
 
     UserVo findUserVoById(Long authorId);
+
+    Result findUserAllInfoById(String id);
 }

@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication
-@ComponentScan("com.adk.admin.config")
+@ComponentScan("com.adk.admin.*")
 public class AdminApplication {
 
     public static void main(String[] args) {

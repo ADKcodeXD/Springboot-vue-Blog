@@ -5,15 +5,16 @@ import com.adk.dao.mapper.SysUserMapper;
 import com.adk.pojo.SysUser;
 import com.adk.service.LoginService;
 import com.adk.service.SysUserService;
-import com.adk.vo.ErrorCode;
-import com.adk.vo.LoginUserVo;
-import com.adk.vo.Result;
-import com.adk.vo.UserVo;
+import com.adk.vo.*;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.format.DateTimeFormat;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Service
 public class SysUserServiceImpl implements SysUserService {
@@ -103,4 +104,24 @@ public class SysUserServiceImpl implements SysUserService {
 
         return userVo;
     }
+
+
+    @Override
+    public Result findUserAllInfoById(String id) {
+        Long id1 = Long.valueOf(id);
+        SysUser sysUser = sysUserMapper.selectById(id1);
+        if (sysUser==null){
+            return Result.fail(ErrorCode.TOKEN_ERROR.getCode(),ErrorCode.TOKEN_ERROR.getMsg());
+        }
+        UserAllInfoVo userAllInfoVo =new UserAllInfoVo();
+        BeanUtils.copyProperties(sysUser,userAllInfoVo);
+        userAllInfoVo.setId(sysUser.getId().toString());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String date = simpleDateFormat.format(new Date(sysUser.getCreateDate()));
+        userAllInfoVo.setCreateDate(date);
+        userAllInfoVo.setEmail(sysUser.getEmail()==null? "未绑定邮箱":sysUser.getEmail());
+        userAllInfoVo.setMobilePhoneNumber(sysUser.getMobilePhoneNumber()==null? "未绑定手机号":sysUser.getMobilePhoneNumber());
+        return Result.success(userAllInfoVo);
+    }
+
 }

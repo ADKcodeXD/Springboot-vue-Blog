@@ -21,4 +21,8 @@ public class UserController {
         return sysUserService.findUserByToken(token);
     }
 
+    @GetMapping("currentUserAllInfo/{id}")
+    public Result currentUserAllInfo(@PathVariable("id")String id){
+        return sysUserService.findUserAllInfoById(id);
+    }
 }

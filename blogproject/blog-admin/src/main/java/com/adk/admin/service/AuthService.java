@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-@Service(value = "authService")
+@Service
 public class AuthService  {
 
     @Autowired

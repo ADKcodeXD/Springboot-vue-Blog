@@ -1,8 +1,7 @@
 import Vuex from 'vuex'
 import Vue from 'vue'
 import {getToken, setToken, removeToken} from '@/request/token'
-import {login, getUserInfo, logout, register} from '@/api/login'
-
+import {login, getUserInfo, logout, register,getUserAllInfo} from '@/api/login'
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -48,7 +47,6 @@ export default new Vuex.Store({
     },
     // 获取用户信息
     getUserInfo({commit, state}) {
-
       let that = this
       return new Promise((resolve, reject) => {
         getUserInfo(state.token).then(data => {

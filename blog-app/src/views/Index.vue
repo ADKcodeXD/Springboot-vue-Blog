@@ -1,5 +1,5 @@
 <template>
-  <div v-title data-title="码神之路">
+  <div v-title data-title="ADKBlog">
     <el-container>
 
       <el-main class="me-articles">
